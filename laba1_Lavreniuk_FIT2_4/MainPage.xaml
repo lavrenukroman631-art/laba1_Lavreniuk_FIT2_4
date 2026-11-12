@@ -1,0 +1,91 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="laba1_Lavreniuk_FIT2_4.MainPage"
+             Title="Особистий кабінет студента">
+
+    <ScrollView>
+        <VerticalStackLayout
+            Padding="30"
+            Spacing="15">
+
+            <Label
+                Text="Особистий кабінет студента"
+                FontSize="26"
+                FontAttributes="Bold"
+                HorizontalOptions="Center" />
+
+            <Button
+                Text="Налаштування теми"
+                Clicked="OnSettingsClicked" />
+
+            <Entry
+                Text="{Binding FullName, Mode=TwoWay}"
+                Placeholder="ПІБ студента" />
+
+            <Entry
+                Text="{Binding Group, Mode=TwoWay}"
+                Placeholder="Група" />
+
+            <Label
+                Text="Середній бал:"
+                FontSize="18" />
+
+            <Slider
+                Minimum="0"
+                Maximum="5"
+                Value="{Binding AverageScore, Mode=TwoWay}" />
+
+            <Label
+                Text="{Binding AverageScore, StringFormat='Середній бал: {0:F2}'}"
+                FontSize="18"
+                HorizontalOptions="Center" />
+
+            <Button
+                Text="Додати студента"
+                Command="{Binding AddStudentCommand}" />
+
+            <Label
+                Text="Список студентів"
+                FontSize="22"
+                FontAttributes="Bold"
+                Margin="0,15,0,0" />
+
+            <CollectionView ItemsSource="{Binding Students}">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Border
+                            Padding="10"
+                            Margin="0,5">
+
+                            <VerticalStackLayout Spacing="8">
+
+                                <Label
+                                    Text="{Binding FullName}"
+                                    FontSize="18"
+                                    FontAttributes="Bold" />
+
+                                <Label
+                                    Text="{Binding Group, StringFormat='Група: {0}'}" />
+
+                                <Label
+                                    Text="{Binding AverageScore, StringFormat='Середній бал: {0:F2}'}" />
+
+                                <Button
+                                    Text="Детальніше"
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.OpenDetailsCommand}"
+                                    CommandParameter="{Binding .}" />
+
+                            </VerticalStackLayout>
+
+                        </Border>
+
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

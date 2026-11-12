@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="laba1_Lavreniuk_FIT2_4.Views.SettingsPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    Title="Налаштування">
+
+    <VerticalStackLayout Padding="25" Spacing="20">
+
+        <Label
+            Text="Налаштування застосунку"
+            FontSize="24"
+            FontAttributes="Bold" />
+
+        <Label
+            Text="Виберіть тему оформлення:"
+            FontSize="18" />
+
+        <Picker
+            x:Name="ThemePicker"
+            Title="Оберіть тему"
+            SelectedIndexChanged="OnThemeChanged">
+
+            <Picker.Items>
+                <x:String>Світла</x:String>
+                <x:String>Темна</x:String>
+            </Picker.Items>
+
+        </Picker>
+
+        <Button
+            Text="Назад"
+            Clicked="OnBackClicked" />
+
+    </VerticalStackLayout>
+</ContentPage>
