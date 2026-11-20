@@ -76,6 +76,12 @@
                                     Text="Детальніше"
                                     Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.OpenDetailsCommand}"
                                     CommandParameter="{Binding .}" />
+                                <Button
+                                    Text="Видалити студента"
+                                    BackgroundColor="Red"
+                                    TextColor="White"
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.DeleteStudentCommand}"
+                                    CommandParameter="{Binding .}" />
 
                             </VerticalStackLayout>
 
