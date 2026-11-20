@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using laba1_Lavreniuk_FIT2_4.Models;
+using laba1_Lavreniuk_FIT2_4.Repositories;
 using Microsoft.Maui.Controls;
 using Microsoft.Maui.Storage;
 
@@ -14,14 +15,15 @@ public class StudentViewModel : INotifyPropertyChanged, IQueryAttributable
 {
     public static StudentViewModel? Instance { get; private set; }
 
+    private readonly IStudentRepository _repository;
     private Student _student = new();
-    private int _nextStudentId = 1;
 
     public ObservableCollection<Student> Students { get; } = new();
 
     public ICommand AddStudentCommand { get; }
     public ICommand OpenDetailsCommand { get; }
     public ICommand LoadCommand { get; }
+    public ICommand DeleteStudentCommand { get; }
 
     public string FullName
     {
@@ -66,28 +68,38 @@ public class StudentViewModel : INotifyPropertyChanged, IQueryAttributable
         }
     }
 
-    public StudentViewModel()
+    public StudentViewModel(IStudentRepository repository)
     {
         Instance = this;
+        _repository = repository;
 
         _student.FullName = Preferences.Get("FormFullName", string.Empty);
         _student.Group = Preferences.Get("FormGroup", string.Empty);
         _student.AverageScore = Preferences.Get("FormAverageScore", 0.0);
 
-        AddStudentCommand = new Command(AddStudent, CanAddStudent);
+        AddStudentCommand = new Command(
+            async () => await AddStudentAsync(),
+            CanAddStudent);
+
         OpenDetailsCommand = new Command<Student>(OpenDetails);
-        LoadCommand = new Command(Load);
+
+        LoadCommand = new Command(
+            async () => await LoadAsync());
+        DeleteStudentCommand = new Command<Student>(
+            async (student) => await DeleteStudentAsync(student));
     }
 
-    private void AddStudent()
+    private async Task AddStudentAsync()
     {
-        Students.Add(new Student
+        Student newStudent = new()
         {
-            Id = _nextStudentId++,
             FullName = FullName,
             Group = Group,
             AverageScore = AverageScore
-        });
+        };
+
+        await _repository.SaveAsync(newStudent);
+        Students.Add(newStudent);
 
         FullName = string.Empty;
         Group = string.Empty;
@@ -112,18 +124,51 @@ public class StudentViewModel : INotifyPropertyChanged, IQueryAttributable
         await Shell.Current.GoToAsync("studentdetail", parameters);
     }
 
-    private void Load()
+    private async Task LoadAsync()
     {
-        Debug.WriteLine("Список студентів завантажено.");
+        try
+        {
+            var students = await _repository.GetAllAsync();
+
+            Students.Clear();
+
+            foreach (var student in students)
+                Students.Add(student);
+
+            Debug.WriteLine("Список студентів завантажено з SQLite.");
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Помилка завантаження: {ex.Message}");
+        }
     }
 
-    public void ApplyQueryAttributes(IDictionary<string, object> query)
+    private async Task DeleteStudentAsync(Student? student)
+    {
+        if (student == null)
+            return;
+
+        bool confirm = await Shell.Current.DisplayAlert(
+            "Видалення студента",
+            $"Ви дійсно хочете видалити {student.FullName}?",
+            "Так",
+            "Ні");
+
+        if (!confirm)
+            return;
+
+        await _repository.DeleteAsync(student);
+        Students.Remove(student);
+    }
+    public async void ApplyQueryAttributes(IDictionary<string, object> query)
     {
         if (query.TryGetValue("OriginalStudent", out var originalValue)
             && originalValue is Student originalStudent
             && query.TryGetValue("UpdatedStudent", out var updatedValue)
             && updatedValue is Student updatedStudent)
         {
+            await _repository.SaveAsync(updatedStudent);
+
             int index = Students.IndexOf(originalStudent);
 
             if (index >= 0)

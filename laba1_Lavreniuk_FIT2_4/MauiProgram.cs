@@ -1,6 +1,7 @@
 ﻿
 using Microsoft.Extensions.Logging;
 using laba1_Lavreniuk_FIT2_4.Services;
+using laba1_Lavreniuk_FIT2_4.Repositories;
 
 namespace laba1_Lavreniuk_FIT2_4
 {
@@ -20,6 +21,10 @@ namespace laba1_Lavreniuk_FIT2_4
 
             builder.Services.AddSingleton<IAppStateService, AppStateService>();
 
+            // Реєстрація репозиторію студентів
+            builder.Services.AddSingleton<IStudentRepository, StudentRepository>();
+            builder.Services.AddSingleton<SyncService>();
+            builder.Services.AddSingleton<EncryptionService>();
 #if DEBUG
             builder.Logging.AddDebug();
 #endif
